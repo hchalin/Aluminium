@@ -10,9 +10,9 @@ typealias ViewRepresentable = UIViewRepresentable
 struct MetalView: ViewRepresentable {
   let view = MTKView()
 
-  func makeCoordinator() -> Renderer {
-    let renderer = Renderer(metalView: view)
-    return renderer
+  func makeCoordinator() -> GameController {
+    let gameController = GameController(metalView: view)
+    return gameController
   }
 
 #if os(macOS)
@@ -39,7 +39,6 @@ struct MetalView: ViewRepresentable {
   func updateMetalView() {
   }
 }
-
 #Preview {
   VStack {
     MetalView()

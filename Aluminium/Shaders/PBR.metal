@@ -34,7 +34,7 @@
 using namespace metal;
 #import "Lighting.h"
 
-/*
+
 float G1V(float nDotV, float k)
 {
   return 1.0f / (nDotV * (1.0f - k) + k);
@@ -124,4 +124,4 @@ float3 computeAmbient(
   }
   return ambient;
 }
-*/
+
