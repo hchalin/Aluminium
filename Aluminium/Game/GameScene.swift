@@ -41,6 +41,7 @@ struct GameScene {
     let lighting = SceneLighting()
 
     init() {
+        camera.transform = defaultView
         camera.target = [0, 1, 0]
         camera.distance = 4
         treefir1.position = [0.5, 0, 2.5]
@@ -56,18 +57,21 @@ struct GameScene {
     mutating func update(dT: Float) {
         let input = InputController.shared
         if input.keysPressed.contains(.one) {
+            camera.distance = 4
             camera.transform = Transform()
         }
         if input.keysPressed.contains(.two) {
+            camera.distance = 4
             camera.transform = defaultView
         }
         camera.update(dT: dT)
-        calculateGizmo()
+//        calculateGizmo()
     }
 
     func createModel(name: String) -> Model {
         let model = Model(name: name, objectId: Self.objectId)
         Self.objectId += 1 // Increment obj id
+        print(Self.objectId)
         return model
     }
 

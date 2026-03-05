@@ -4,10 +4,10 @@ class InputController {
     struct Point {
         var x: Float
         var y: Float
-        static var zero = Point(x: 0, y: 0) // Singleton?
+        static var zero = Point(x: 0, y: 0)
     }
 
-    static let shared = InputController() // Create a singleton of input controller
+    static let shared = InputController() // Create a singleton of input controller (Static and const)
     var keysPressed: Set<GCKeyCode> = [] // A set is O(1) (hash based)
     var leftMouseDown = false
     var mouseDelta: Point = Point.zero

@@ -17,14 +17,17 @@ class Renderer: NSObject {
     static var device: MTLDevice!
     static var commandQueue: MTLCommandQueue!
     static var library: MTLLibrary!
-    static var viewColorPixelFormat = MTLPixelFormat.bgra8Unorm
+    static var viewColorPixelFormat = MTLPixelFormat.bgra8Unorm_srgb
+    static var viewDepthPixelFormat = MTLPixelFormat.depth32Float
     static var scaleFactor: CGFloat = 1
 
-    var pipelineState: MTLRenderPipelineState!
-    let depthStencilState: MTLDepthStencilState?
 
     var uniforms = Uniforms()
     var params = Params()
+
+    // 2 Passes
+    var forwardRenderPass: ForwardRenderPass
+    var objectIdRenderPass: ObjectIdRenderPass
 
     init(metalView: MTKView) {
         // Acquire Metal device and create command queue
@@ -59,17 +62,14 @@ class Renderer: NSObject {
         pipelineDescriptor.colorAttachments[0].pixelFormat =
             metalView.colorPixelFormat
         pipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
+
         pipelineDescriptor.vertexDescriptor =
             MTLVertexDescriptor.defaultLayout
-        do {
-            pipelineState =
-                try device.makeRenderPipelineState(
-                    descriptor: pipelineDescriptor)
-        } catch {
-            fatalError(error.localizedDescription)
-        }
-        // Build depth/stencil state
-        depthStencilState = Renderer.buildDepthStencilState()
+
+        // Initialize render passes
+        objectIdRenderPass = ObjectIdRenderPass()
+        forwardRenderPass = ForwardRenderPass(view: metalView)
+
         super.init()
         // Final MTKView configuration and delegate hookup
         metalView.clearColor = MTLClearColor(
@@ -87,15 +87,6 @@ class Renderer: NSObject {
          END
          */
     }
-
-    /// Creates a depth/stencil state for depth testing (less, writes enabled).
-    static func buildDepthStencilState() -> MTLDepthStencilState? {
-        let descriptor = MTLDepthStencilDescriptor()
-        descriptor.depthCompareFunction = .less
-        descriptor.isDepthWriteEnabled = true
-        return Renderer.device.makeDepthStencilState(
-            descriptor: descriptor)
-    }
 }
 
 /// MTKViewDelegate methods: handle view resizing and per-frame drawing.
@@ -110,6 +101,11 @@ extension Renderer {
         drawableSizeWillChange size: CGSize
     ) {
         // Called on window resize
+        objectIdRenderPass.resize(view: view, size: size)
+        forwardRenderPass.resize(view: view, size: size)
+        params.width = UInt32(size.width)
+        params.height = UInt32(size.height)
+        params.scaleFactor = Float(Self.scaleFactor)
     }
 
     /**
@@ -123,46 +119,28 @@ extension Renderer {
     }
 
     func draw(scene: GameScene, in view: MTKView) {
-        
-        // Create an auto release pool scope
-        autoreleasepool {
-            
-            updateUniforms(scene: scene)
-            
-            guard
-                let commandBuffer = Self.commandQueue.makeCommandBuffer(),
-                let descriptor = view.currentRenderPassDescriptor,              // Render pass descriptor for render encoder
-                let drawable = view.currentDrawable,
-                let renderEncoder =
-                commandBuffer.makeRenderCommandEncoder(
-                    descriptor: descriptor) else {
-                return
-            }
-
-
-            renderEncoder.setDepthStencilState(depthStencilState)
-            renderEncoder.setRenderPipelineState(pipelineState)
-
-            // Add lights to fragment
-            var lights = scene.lighting.lights // Grab the lights from the scene
-            renderEncoder.setFragmentBytes( // Bind to fragment function in the LightBuffer idx
-                &lights,
-                length: MemoryLayout<Light>.stride * lights.count,
-                index: LightBuffer.index
-            )
-
-            for model in scene.models {
-                model.render(
-                    encoder: renderEncoder,
-                    uniforms: uniforms,
-                    params: params)
-            }
-
-
-            renderEncoder.endEncoding()
-            commandBuffer.present(drawable)
-            commandBuffer.commit()
+        guard
+            let commandBuffer = Self.commandQueue.makeCommandBuffer(),
+            let descriptor = view.currentRenderPassDescriptor
+        else {
+            return
         }
+
+        updateUniforms(scene: scene)
+
+        // Draw
+        objectIdRenderPass.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
+
+        forwardRenderPass.descriptor = descriptor //
+        forwardRenderPass.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
+
+        // Hold onto drawable as short as possible
+        guard let drawable = view.currentDrawable else {
+            return // skips frame
+        }
+
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
     }
 }
 

@@ -16,7 +16,11 @@ typedef struct {
     uint32_t tiling;
     uint32_t lightCount;
     vector_float3 cameraPosition;
-} Params;
+    uint32_t objectId;
+    uint32_t touchX;
+    uint32_t touchY;
+    float scaleFactor;
+} Params;       // These are sent to the fragment function
 
 typedef enum {
     VertexBuffer    = 0,

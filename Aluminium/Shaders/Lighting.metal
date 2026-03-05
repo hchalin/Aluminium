@@ -40,7 +40,6 @@ float3 phongLighting(float3 normal, float3 position, constant Params &params, co
     for (uint i { 0 }; i < params.lightCount; ++i) {
         // Create a light
         Light light = lights[i];
-        // Todo: Create surfacecolor variable to replace light.color
         float3 surfaceColor = light.color * light.intensity * baseColor;
         switch (light.type) {
             /*

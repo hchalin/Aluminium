@@ -13,6 +13,8 @@ struct Submesh {
         var baseColor: MTLTexture?
         var roughness: MTLTexture?
         var normal: MTLTexture?
+        var metallic: MTLTexture?
+        var ambientOcclusion: MTLTexture?
     }
 }
 
@@ -35,6 +37,8 @@ private extension Submesh.Textures {
         baseColor = material?.texture(type: .baseColor)
         roughness = material?.texture(type: .roughness)
         normal = material?.texture(type: .tangentSpaceNormal)
+        metallic = material?.texture(type: .metallic)
+        ambientOcclusion = material?.texture(type: .ambientOcclusion)
     }
 }
 
@@ -46,20 +50,25 @@ private extension MDLMaterialProperty {
 }
 
 /* 3
-
  MDLMaterial.property(with:) looks up the provided property in the submesh’s material. You then check whether the property type is a texture and load the texture into TextureController.textures. Material properties can also be float values where there is no texture available for the submesh.
  */
 private extension MDLMaterial {
-    func texture(type semantic: MDLMaterialSemantic) -> MTLTexture? {
-        if let property = property(with: semantic),
-           property.type == .texture,
-           let mdlTexture = property.textureSamplerValue?.texture {
-            return TextureController.loadTexture(
-                texture: mdlTexture,
-                name: property.textureName)
-        }
-        return nil
+  func texture(type semantic: MDLMaterialSemantic) -> MTLTexture? {
+    if let property = property(with: semantic),
+    property.type == .texture,
+    let mdlTexture = property.textureSamplerValue?.texture {
+      var texture = TextureController.loadTexture(
+        texture: mdlTexture,
+        name: property.textureName)
+      if semantic == .baseColor,
+        texture?.pixelFormat == .rgba8Unorm {
+        texture = texture?.makeTextureView(pixelFormat: .rgba8Unorm_srgb)
+        TextureController.textures[property.textureName] = texture
+      }
+      return texture
     }
+    return nil
+  }
 }
 
 private extension Material {
