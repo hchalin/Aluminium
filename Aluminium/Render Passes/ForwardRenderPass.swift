@@ -57,7 +57,9 @@ struct ForwardRenderPass: RenderPass {
                 uniforms: uniforms,
                 params: params)
         }
-
+        // debug sun
+        var scene = scene
+        DebugModel.debugDrawModel(renderEncoder: renderEncoder, uniforms: uniforms, model: scene.sun, color: [0.9, 0.8, 0.2])
         renderEncoder.endEncoding()
     }
 }
