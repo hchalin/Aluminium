@@ -13,7 +13,8 @@ fragment float4 fragment_main(
     constant Light      *lights[[buffer(LightBuffer)]],
     constant Material & _material [[buffer(MaterialBuffer)]],
     texture2d < float > roughnessTexture [[texture(RoughnessTexture)]],
-    texture2d < float > normalTexture [[texture(NormalTexture)]]
+    texture2d < float > normalTexture [[texture(NormalTexture)]],
+    texture2d < uint >  idTexture  [[texture(11)]]
     ) {
     // Add material to override
     Material material = _material;
@@ -31,6 +32,18 @@ fragment float4 fragment_main(
         material.baseColor = baseColorTexture.sample(
             textureSampler,
             in.uv * params.tiling).rgb;
+    }
+
+    if (!is_null_texture(idTexture)) {
+        uint2 coord = uint2(
+            params.touchX * params.scaleFactor,
+            params.touchY * params.scaleFactor
+                            );
+        uint objectId = idTexture.read(coord).r;
+        
+        if (params.objectId != 0 && objectId == params.objectId){
+            material.baseColor = float3(0.9, 0.5, 0.0);
+        }
     }
 
     // Calc roughness texture
@@ -53,10 +66,11 @@ fragment float4 fragment_main(
             ).rgb;
         normal = normal * 2 - 1;
         normal = float3x3(
-          in.worldTangent,
-          in.worldBitangent,
-          in.worldNormal) * normal;
+            in.worldTangent,
+            in.worldBitangent,
+            in.worldNormal) * normal;
     }
+
     normal = normalize(normal);
 //    float3 color = normal;
 
@@ -67,7 +81,7 @@ fragment float4 fragment_main(
     float3 specularColor = computeSpecular(lights, params, material, normal, in.worldPosition);
 
     float3 ambientColor = computeAmbient(
-      lights, params, material);
-    
+        lights, params, material);
+
     return float4(diffuseColor + specularColor + ambientColor, 1);
 }

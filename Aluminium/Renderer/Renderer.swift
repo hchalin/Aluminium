@@ -51,21 +51,7 @@ class Renderer: NSObject {
         // Create shader library and look up shader entry points
         let library = device.makeDefaultLibrary()
         Self.library = library
-        let vertexFunction = library?.makeFunction(name: "vertex_main")
-        let fragmentFunction =
-            library?.makeFunction(name: "fragment_main")
-
-        // Build render pipeline state (vertex layout, shaders, pixel formats)
-        let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        pipelineDescriptor.vertexFunction = vertexFunction
-        pipelineDescriptor.fragmentFunction = fragmentFunction
-        pipelineDescriptor.colorAttachments[0].pixelFormat =
-            metalView.colorPixelFormat
-        pipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
-
-        pipelineDescriptor.vertexDescriptor =
-            MTLVertexDescriptor.defaultLayout
-
+        
         // Initialize render passes
         objectIdRenderPass = ObjectIdRenderPass()
         forwardRenderPass = ForwardRenderPass(view: metalView)
@@ -131,7 +117,8 @@ extension Renderer {
         // Draw
         objectIdRenderPass.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
 
-        forwardRenderPass.descriptor = descriptor //
+        forwardRenderPass.idTexture = objectIdRenderPass.idTexture          // This passes the texture
+        forwardRenderPass.descriptor = descriptor
         forwardRenderPass.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
 
         // Hold onto drawable as short as possible

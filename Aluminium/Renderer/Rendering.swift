@@ -15,7 +15,7 @@ extension Model {
     var uniforms = vertex
     var params = fragment
     params.tiling = tiling
-//    params.objectId = objectId
+    params.objectId = objectId
 
     uniforms.modelMatrix = transform.modelMatrix
     uniforms.normalMatrix = uniforms.modelMatrix.upperLeft

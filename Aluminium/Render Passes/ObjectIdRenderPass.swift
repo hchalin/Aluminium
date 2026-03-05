@@ -43,8 +43,8 @@ struct ObjectIdRenderPass: RenderPass {
       return
     }
     descriptor.colorAttachments[0].texture = idTexture
-//    descriptor.colorAttachments[0].loadAction = .clear
-//    descriptor.colorAttachments[0].storeAction = .store
+    descriptor.colorAttachments[0].loadAction = .clear
+    descriptor.colorAttachments[0].storeAction = .store
     descriptor.depthAttachment.texture = depthTexture
     guard let renderEncoder =
       commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)
