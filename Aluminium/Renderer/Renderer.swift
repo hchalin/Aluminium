@@ -21,13 +21,16 @@ class Renderer: NSObject {
     static var viewDepthPixelFormat = MTLPixelFormat.depth32Float
     static var scaleFactor: CGFloat = 1
 
-
     var uniforms = Uniforms()
     var params = Params()
+    
+    // Shadow camera for the renderer
+    var shadowCamera = OrthographicCamera()
 
     // 2 Passes
     var forwardRenderPass: ForwardRenderPass
-    var objectIdRenderPass: ObjectIdRenderPass
+    var objectIdRenderPass: ObjectIdRenderPass?
+    var shadowRenderPass: ShadowRenderPass
 
     init(metalView: MTKView) {
         // Acquire Metal device and create command queue
@@ -51,10 +54,13 @@ class Renderer: NSObject {
         // Create shader library and look up shader entry points
         let library = device.makeDefaultLibrary()
         Self.library = library
-        
+
         // Initialize render passes
-        objectIdRenderPass = ObjectIdRenderPass()
+        if (GameScene.selectableObjects){
+            objectIdRenderPass = ObjectIdRenderPass()
+        }
         forwardRenderPass = ForwardRenderPass(view: metalView)
+        shadowRenderPass = ShadowRenderPass()
 
         super.init()
         // Final MTKView configuration and delegate hookup
@@ -87,7 +93,8 @@ extension Renderer {
         drawableSizeWillChange size: CGSize
     ) {
         // Called on window resize
-        objectIdRenderPass.resize(view: view, size: size)
+        shadowRenderPass.resize(view: view, size: size)
+        objectIdRenderPass?.resize(view: view, size: size)
         forwardRenderPass.resize(view: view, size: size)
         params.width = UInt32(size.width)
         params.height = UInt32(size.height)
@@ -102,6 +109,18 @@ extension Renderer {
         uniforms.projectionMatrix = scene.camera.projectionMatrix
         params.lightCount = UInt32(scene.lighting.lights.count)
         params.cameraPosition = scene.camera.position
+        shadowCamera.viewSize = 16
+        shadowCamera.far = 16
+        let sun = scene.lighting.lights[0]
+        // Set the shadow cam pos to sun pos, since we will render the shadow image from the position of the sun
+        shadowCamera.position = sun.position
+        uniforms.shadowProjectionMatrix = shadowCamera.projectionMatrix
+        // Create a lookAt matrix with the sun looking at the center of the scene
+        uniforms.shadowViewMatrix = matrix_float4x4(eye: sun.position, target: .zero, up: [0, 1, 0])
+        
+        // Temp debug
+//        uniforms.viewMatrix = uniforms.shadowViewMatrix
+//        uniforms.projectionMatrix = uniforms.shadowProjectionMatrix
     }
 
     func draw(scene: GameScene, in view: MTKView) {
@@ -115,12 +134,14 @@ extension Renderer {
         updateUniforms(scene: scene)
 
         // Draw
-        objectIdRenderPass.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
-
-        forwardRenderPass.idTexture = objectIdRenderPass.idTexture          // This passes the texture
+        shadowRenderPass.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
+        if scene.selectableObjects {
+            objectIdRenderPass?.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
+            forwardRenderPass.idTexture = objectIdRenderPass?.idTexture // This passes the texture
+        }
+        forwardRenderPass.shadowTexture = shadowRenderPass.shadowTexture
         forwardRenderPass.descriptor = descriptor
         forwardRenderPass.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
-
         // Hold onto drawable as short as possible
         guard let drawable = view.currentDrawable else {
             return // skips frame

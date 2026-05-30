@@ -8,6 +8,8 @@ typedef struct {
     matrix_float4x4 viewMatrix;
     matrix_float4x4 projectionMatrix;
     matrix_float3x3 normalMatrix;
+    matrix_float4x4 shadowProjectionMatrix;
+    matrix_float4x4 shadowViewMatrix;
 } Uniforms;
 
 typedef struct {
@@ -20,6 +22,7 @@ typedef struct {
     uint32_t touchX;
     uint32_t touchY;
     float scaleFactor;
+    uint32_t selectableObjects;
 } Params;       // These are sent to the fragment function
 
 typedef enum {
@@ -30,7 +33,8 @@ typedef enum {
     UniformsBuffer  = 11,
     ParamsBuffer    = 12,
     LightBuffer     = 13,
-    MaterialBuffer  = 14
+    MaterialBuffer  = 14,
+    ColorBuffer     = 15
 } BufferIndices;
 
 

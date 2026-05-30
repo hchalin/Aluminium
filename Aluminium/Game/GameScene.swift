@@ -52,15 +52,19 @@ struct GameScene {
     var shouldDrawBoundingSphere = false
     
     var isPaused = false                    // Used to pause the game scene
+    var selectableObjects = false
+    static let selectableObjects = false
 
     init() {
         camera.transform = defaultView
         camera.target = [0, 1, 0]
         camera.distance = 4
+        camera.far = 10
         treefir1.position = [0.5, 0, 2.5]
         treefir2.position = [-0.8, 0, -1.8]
         treefir3.position = [2, 0, -0.5]
         models = [treefir1, treefir2, treefir3, train, ground]
+        
     }
 
     mutating func update(size: CGSize) {
@@ -112,7 +116,10 @@ struct GameScene {
         if input.keysPressed.contains(.five){
             shouldDrawBoundingSphere.toggle()
         }
-        
+        if input.keysPressed.contains(.six){
+            selectableObjects.toggle()
+        }
+
         if !isPaused {
             if shouldDrawMainCamera || shouldDrawLightCamera || shouldDrawBoundingSphere {
                 isPaused = true

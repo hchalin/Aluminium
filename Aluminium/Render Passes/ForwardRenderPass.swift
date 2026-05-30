@@ -15,6 +15,7 @@ struct ForwardRenderPass: RenderPass {
     var depthStencilState: MTLDepthStencilState?
 
     weak var idTexture: MTLTexture?
+    weak var shadowTexture: MTLTexture?
 
     init(view: MTKView) {
         pipelineState = PipelineStates.createForwardPSO()
@@ -47,10 +48,12 @@ struct ForwardRenderPass: RenderPass {
         )
 
         renderEncoder.setFragmentTexture(idTexture, index: 11)
+        renderEncoder.setFragmentTexture(shadowTexture, index: 12)
         let inputController = InputController.shared
         var params = params
         params.touchX = UInt32(inputController.touchLocation?.x ?? 0)
         params.touchY = UInt32(inputController.touchLocation?.y ?? 0)
+        params.selectableObjects = scene.selectableObjects ? 1 : 0
         for model in scene.models {
             model.render(
                 encoder: renderEncoder,
@@ -60,6 +63,9 @@ struct ForwardRenderPass: RenderPass {
         // debug sun
         var scene = scene
         DebugModel.debugDrawModel(renderEncoder: renderEncoder, uniforms: uniforms, model: scene.sun, color: [0.9, 0.8, 0.2])
+        DebugCameraFrustum.draw(encoder: renderEncoder, scene: scene, uniforms: uniforms)
+
+//        DebugLights.draw(lights: scene.lighting.lights, encoder: renderEncoder , uniforms: uniforms)
         renderEncoder.endEncoding()
     }
 }

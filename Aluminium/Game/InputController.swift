@@ -85,6 +85,7 @@ class InputController {
             // 2
             mouse?.mouseInput?.mouseMovedHandler = { _, deltaX, deltaY in
                 self.mouseDelta = Point(x: deltaX, y: deltaY)
+                
             }
 
             // 3

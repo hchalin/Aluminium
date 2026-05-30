@@ -14,7 +14,8 @@ fragment float4 fragment_main(
     constant Material & _material [[buffer(MaterialBuffer)]],
     texture2d < float > roughnessTexture [[texture(RoughnessTexture)]],
     texture2d < float > normalTexture [[texture(NormalTexture)]],
-    texture2d < uint >  idTexture  [[texture(11)]]
+    texture2d < uint >  idTexture  [[texture(11)]],
+    depth2d < float >   shadowTexture [[texture(12)]]
     ) {
     // Add material to override
     Material material = _material;
@@ -34,7 +35,8 @@ fragment float4 fragment_main(
             in.uv * params.tiling).rgb;
     }
 
-    if (!is_null_texture(idTexture)) {
+    
+    if (params.selectableObjects && !is_null_texture(idTexture)) {
         uint2 coord = uint2(
             params.touchX * params.scaleFactor,
             params.touchY * params.scaleFactor
@@ -45,6 +47,7 @@ fragment float4 fragment_main(
             material.baseColor = float3(0.9, 0.5, 0.0);
         }
     }
+        
 
     // Calc roughness texture
     if (!is_null_texture(roughnessTexture)) {
@@ -82,6 +85,27 @@ fragment float4 fragment_main(
 
     float3 ambientColor = computeAmbient(
         lights, params, material);
+    
+    
+    float3 shadowPosition = in.shadowPosition.xyz / in.shadowPosition.w;        // Perspective divide
+    float2 xy = shadowPosition.xy;
+    xy = xy * 0.5 + 0.5;            // rescale from [-1, 1] -> [0, 1]
+    xy.y = 1 - xy.y;                // Reverse the y coord
+    if (xy.x < 0 || xy.x > 1 || xy.y < 0 || xy.y > 1){
+        return float4(1.0, 0.0, 0.0, 1.0);
+    }
+    xy = saturate(xy);
+    
+    constexpr sampler s(
+                        coord::normalized,
+                        filter::linear,
+                        address::clamp_to_edge,
+                        compare_func::less
+                        );
+    float shadowSample = shadowTexture.sample(s,xy);
+    if (shadowPosition.z > shadowSample + 0.0001){
+        diffuseColor *= .5;
+    }
 
     return float4(diffuseColor + specularColor + ambientColor, 1);
 }

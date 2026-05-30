@@ -21,7 +21,11 @@ vertex VertexOut vertex_main(
         .worldPosition = worldPosition.xyz / worldPosition.w,
         .worldNormal = uniforms.normalMatrix * in.normal,
         .worldTangent = uniforms.normalMatrix * in.tangent,
-        .worldBitangent = uniforms.normalMatrix * in.bitangent
+        .worldBitangent = uniforms.normalMatrix * in.bitangent,
+        //mvp
+        .shadowPosition = uniforms.shadowProjectionMatrix *
+                          uniforms.shadowViewMatrix *
+        uniforms.modelMatrix * in.position
     };
 
     return out;

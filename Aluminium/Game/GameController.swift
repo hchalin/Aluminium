@@ -21,6 +21,7 @@ class GameController: NSObject {
         metalView.delegate = self
         fps = Double(metalView.preferredFramesPerSecond)
         mtkView(metalView, drawableSizeWillChange: metalView.drawableSize)
+        // Temp
     }
 }
 
