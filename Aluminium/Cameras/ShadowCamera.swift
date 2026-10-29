@@ -21,12 +21,13 @@ extension Camera {
   static func createShadowCamera(using camera: Camera, lightPosition: float3) -> OrthographicCamera {
     guard let camera = camera as? ArcballCamera else { return OrthographicCamera() }
     let nearPoints = calculatePlane(camera: camera, distance: camera.near)
-    let farPoints = calculatePlane(camera: camera, distance: camera.far)
+    let farLimit = min(camera.far, 30) // limit how far the shadow covers to increase texel density
+    let farPoints = calculatePlane(camera: camera, distance: farLimit)
 
-    // calculate bounding sphere of camera
+    // calculate bounding sphere of the limited camera frustum
     let radius1 = distance(nearPoints.lowerLeft, farPoints.upperRight) * 0.5
     let radius2 = distance(farPoints.lowerLeft, farPoints.upperRight) * 0.5
-    var center: float3
+    let center: float3
     if radius1 > radius2 {
       center = simd_mix(nearPoints.lowerLeft, farPoints.upperRight, [0.5, 0.5, 0.5])
     } else {
@@ -34,7 +35,6 @@ extension Camera {
     }
     let radius = max(radius1, radius2)
 
-    // create shadow camera using bounding sphere
     var shadowCamera = OrthographicCamera()
     let direction = normalize(lightPosition)
     shadowCamera.position = center + direction * radius
@@ -100,3 +100,4 @@ extension Camera {
     return points
   }
 }
+

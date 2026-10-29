@@ -18,7 +18,7 @@ struct ShadowRenderPass: RenderPass {
         descriptor = MTLRenderPassDescriptor()
         depthStencilState = Self.buildDepthStencilState()
         pipelineState = PipelineStates.createShadowPSO()
-        shadowTexture = Self.makeTexture(size: CGSize(width: 2048,height: 2048), pixelFormat: .depth32Float, label: "Shadow Depth Texture")
+        shadowTexture = Self.makeTexture(size: CGSize(width: 4096,height: 4096), pixelFormat: .depth32Float, label: "Shadow Depth Texture")
     }
     
     mutating func resize(view: MTKView, size: CGSize) {
@@ -47,3 +47,4 @@ struct ShadowRenderPass: RenderPass {
         renderEncoder.endEncoding()
     }
 }
+

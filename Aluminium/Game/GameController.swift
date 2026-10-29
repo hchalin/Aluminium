@@ -23,6 +23,7 @@ class GameController: NSObject {
         mtkView(metalView, drawableSizeWillChange: metalView.drawableSize)
         // Temp
     }
+
 }
 
 extension GameController: MTKViewDelegate {

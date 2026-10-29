@@ -109,14 +109,14 @@ extension Renderer {
         uniforms.projectionMatrix = scene.camera.projectionMatrix
         params.lightCount = UInt32(scene.lighting.lights.count)
         params.cameraPosition = scene.camera.position
-        shadowCamera.viewSize = 16
-        shadowCamera.far = 16
         let sun = scene.lighting.lights[0]
-        // Set the shadow cam pos to sun pos, since we will render the shadow image from the position of the sun
-        shadowCamera.position = sun.position
+        shadowCamera = ArcballCamera.createShadowCamera(using: scene.camera, lightPosition: sun.position)
         uniforms.shadowProjectionMatrix = shadowCamera.projectionMatrix
-        // Create a lookAt matrix with the sun looking at the center of the scene
-        uniforms.shadowViewMatrix = matrix_float4x4(eye: sun.position, target: .zero, up: [0, 1, 0])
+        uniforms.shadowViewMatrix = matrix_float4x4(
+            eye: shadowCamera.position,
+            target: shadowCamera.center,
+            up: [0, 1, 0]
+        )
         
         // Temp debug
 //        uniforms.viewMatrix = uniforms.shadowViewMatrix
@@ -129,6 +129,9 @@ extension Renderer {
             let descriptor = view.currentRenderPassDescriptor
         else {
             return
+        }
+         guard let drawable = view.currentDrawable else {
+            return // skips frame
         }
 
         updateUniforms(scene: scene)
@@ -143,9 +146,6 @@ extension Renderer {
         forwardRenderPass.descriptor = descriptor
         forwardRenderPass.draw(commandBuffer: commandBuffer, scene: scene, uniforms: uniforms, params: params)
         // Hold onto drawable as short as possible
-        guard let drawable = view.currentDrawable else {
-            return // skips frame
-        }
 
         commandBuffer.present(drawable)
         commandBuffer.commit()
@@ -153,3 +153,4 @@ extension Renderer {
 }
 
 // swiftlint:enable implicitly_unwrapped_optional
+

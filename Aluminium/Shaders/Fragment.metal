@@ -91,21 +91,22 @@ fragment float4 fragment_main(
     float2 xy = shadowPosition.xy;
     xy = xy * 0.5 + 0.5;            // rescale from [-1, 1] -> [0, 1]
     xy.y = 1 - xy.y;                // Reverse the y coord
-    if (xy.x < 0 || xy.x > 1 || xy.y < 0 || xy.y > 1){
-        return float4(1.0, 0.0, 0.0, 1.0);
-    }
+//    if (xy.x < 0 || xy.x > 1 || xy.y < 0 || xy.y > 1){
+//        return float4(1.0, 0.0, 0.0, 1.0);
+//    }
     xy = saturate(xy);
     
-    constexpr sampler s(
+    constexpr sampler shadowSampler(
                         coord::normalized,
                         filter::linear,
                         address::clamp_to_edge,
-                        compare_func::less
+                        compare_func::less_equal
                         );
-    float shadowSample = shadowTexture.sample(s,xy);
-    if (shadowPosition.z > shadowSample + 0.0001){
-        diffuseColor *= .5;
-    }
+    float bias = 0.001; // tune per scene scale
+    float visibility = shadowTexture.sample_compare(shadowSampler, xy, shadowPosition.z - bias);
+    // Mix between shadowed (0.5) and lit (1.0) based on visibility
+    diffuseColor *= mix(0.5, 1.0, visibility);
 
     return float4(diffuseColor + specularColor + ambientColor, 1);
 }
+

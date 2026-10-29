@@ -59,7 +59,7 @@ struct GameScene {
         camera.transform = defaultView
         camera.target = [0, 1, 0]
         camera.distance = 4
-        camera.far = 10
+        camera.far = 100
         treefir1.position = [0.5, 0, 2.5]
         treefir2.position = [-0.8, 0, -1.8]
         treefir3.position = [2, 0, -0.5]
