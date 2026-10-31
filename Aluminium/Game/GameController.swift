@@ -18,6 +18,7 @@ class GameController: NSObject {
         renderer = Renderer(metalView: metalView)
         scene = GameScene()
         super.init()
+				print("\(#fileID) - Light Count: \(scene.lighting.lights.count)")
         metalView.delegate = self
         fps = Double(metalView.preferredFramesPerSecond)
         mtkView(metalView, drawableSizeWillChange: metalView.drawableSize)

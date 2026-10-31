@@ -16,6 +16,8 @@ struct ForwardRenderPass: RenderPass {
 
     weak var idTexture: MTLTexture?
     weak var shadowTexture: MTLTexture?
+		
+		var lightsBuffer
 
     init(view: MTKView) {
         pipelineState = PipelineStates.createForwardPSO()
@@ -41,6 +43,7 @@ struct ForwardRenderPass: RenderPass {
 
         // Add lights to fragment
         var lights = scene.lighting.lights // Grab the lights from the scene
+				
         renderEncoder.setFragmentBytes( // Bind to fragment function in the LightBuffer idx
             &lights,
             length: MemoryLayout<Light>.stride * lights.count,
@@ -63,6 +66,7 @@ struct ForwardRenderPass: RenderPass {
         // debug sun
         var scene = scene
         DebugModel.debugDrawModel(renderEncoder: renderEncoder, uniforms: uniforms, model: scene.sun, color: [0.9, 0.8, 0.2])
+//				DebugModel.debugDrawModel(renderEncoder: renderEncoder, uniforms: uniforms, model: scene.pointLightMesh, color: [1.0,0.0,0.0])
         DebugCameraFrustum.draw(encoder: renderEncoder, scene: scene, uniforms: uniforms)
 
 //        DebugLights.draw(lights: scene.lighting.lights, encoder: renderEncoder , uniforms: uniforms)

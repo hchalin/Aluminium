@@ -24,7 +24,7 @@ struct SceneLighting {
     let sunLight: Light = {
         var light = Self.buildDefaultLight()
         light.position = [3, 3, -2]
-        light.intensity = 0.9
+        light.intensity = 0.1
         return light
     }()
     let ambientLight: Light = {
@@ -37,8 +37,9 @@ struct SceneLighting {
     let redPointLight: Light = {
         var light = Self.buildDefaultLight()
         light.type = Point
-        light.position = [-0.8, 0.76, -0.18]
+        light.position = [-1.8, 0.76, -0.18]
         light.color = [1, 0, 0]
+				light.intensity = 1.0
         light.attenuation = [0.5, 2, 1]
         return light
     }()
@@ -59,5 +60,7 @@ struct SceneLighting {
     init() {
         lights.append(sunLight)
         lights.append(ambientLight)
+				lights.append(redPointLight)
+			print(lights[2].color)
     }
 }
