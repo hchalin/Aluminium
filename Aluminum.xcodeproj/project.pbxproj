@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		C371F9472F3C0FF400E991C8 /* Aluminium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aluminium.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C371F9472F3C0FF400E991C8 /* Aluminum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aluminum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,7 +40,7 @@
 		C371F9482F3C0FF400E991C8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C371F9472F3C0FF400E991C8 /* Aluminium.app */,
+				C371F9472F3C0FF400E991C8 /* Aluminum.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C371F9462F3C0FF400E991C8 /* Aluminium */ = {
+		C371F9462F3C0FF400E991C8 /* Aluminum */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C371F9522F3C0FF500E991C8 /* Build configuration list for PBXNativeTarget "Aluminium" */;
+			buildConfigurationList = C371F9522F3C0FF500E991C8 /* Build configuration list for PBXNativeTarget "Aluminum" */;
 			buildPhases = (
 				C371F9432F3C0FF400E991C8 /* Sources */,
 				C371F9442F3C0FF400E991C8 /* Frameworks */,
@@ -63,11 +63,11 @@
 			fileSystemSynchronizedGroups = (
 				C371F9492F3C0FF400E991C8 /* Aluminium */,
 			);
-			name = Aluminium;
+			name = Aluminum;
 			packageProductDependencies = (
 			);
 			productName = Aluminium;
-			productReference = C371F9472F3C0FF400E991C8 /* Aluminium.app */;
+			productReference = C371F9472F3C0FF400E991C8 /* Aluminum.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C371F9422F3C0FF400E991C8 /* Build configuration list for PBXProject "Aluminium" */;
+			buildConfigurationList = C371F9422F3C0FF400E991C8 /* Build configuration list for PBXProject "Aluminum" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C371F9462F3C0FF400E991C8 /* Aluminium */,
+				C371F9462F3C0FF400E991C8 /* Aluminum */,
 			);
 		};
 /* End PBXProject section */
@@ -324,7 +324,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C371F9422F3C0FF400E991C8 /* Build configuration list for PBXProject "Aluminium" */ = {
+		C371F9422F3C0FF400E991C8 /* Build configuration list for PBXProject "Aluminum" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C371F9502F3C0FF500E991C8 /* Debug */,
@@ -333,7 +333,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C371F9522F3C0FF500E991C8 /* Build configuration list for PBXNativeTarget "Aluminium" */ = {
+		C371F9522F3C0FF500E991C8 /* Build configuration list for PBXNativeTarget "Aluminum" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C371F9532F3C0FF500E991C8 /* Debug */,
