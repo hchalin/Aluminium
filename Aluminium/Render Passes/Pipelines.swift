@@ -35,7 +35,7 @@ enum PipelineStates {
     }
 	
 	static func createGBufferPSO() -> MTLRenderPipelineState {
-		let vertexFunction = Renderer.library?.makeFunction(name: "vertex_main")
+		let vertexFunction = Renderer.library?.makeFunction(name: "vertex_quad")
 		let fragementFunction = Renderer.library?.makeFunction(name: "fragment_gbuff")
 		let pipelineDescriptor = MTLRenderPipelineDescriptor()
 		pipelineDescriptor.vertexFunction = vertexFunction
