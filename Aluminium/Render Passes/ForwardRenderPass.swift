@@ -17,7 +17,7 @@ struct ForwardRenderPass: RenderPass {
     weak var idTexture: MTLTexture?
     weak var shadowTexture: MTLTexture?
 		
-		var lightsBuffer
+//		var lightsBuffer
 
     init(view: MTKView) {
         pipelineState = PipelineStates.createForwardPSO()

@@ -26,6 +26,12 @@ typedef struct {
 } Params;       // These are sent to the fragment function
 
 typedef enum {
+	RenderTargetAlbedo = 1,
+	RenderTargetNormal = 2,
+	RenderTargetPosition = 3
+} RenderTargetTextureIndices;
+
+typedef enum {
     VertexBuffer    = 0,
     UVBuffer        = 1,
     TangentBuffer   = 2,
@@ -53,7 +59,9 @@ typedef enum {
     NormalTexture    = 1,
     RoughnessTexture = 2,
     MetallicTexture  = 3,
-    AOTexture        = 4                    // Ambient Occlusion
+    AOTexture        = 4,                    // Ambient Occlusion
+		ShadowTexture    = 5
+	
 } TextureIndices;
 
 typedef enum {
